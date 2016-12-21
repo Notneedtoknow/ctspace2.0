@@ -10,9 +10,32 @@ namespace Common\Controller;
 use Think\Controller;
 class AbstractController extends Controller{
 
+    protected $login_status,$user_id,$user_name,$user_cname;
+
+    protected $need_login = array();
+
     public function __construct()
     {
         parent::__construct();
+
+        if(in_array(ACTION_NAME,$this->need_login)){
+            $this->checkLogin();
+        }
+    }
+
+    /**
+     * 验证登录
+     */
+    public function checkLogin(){
+        $user = session('user');
+        if(empty($user)){
+            $this->redirect('Admin/Index/login',array(),3);
+        }else{
+            $this->login_status = true;
+            $this->user_id = $user['id'];
+            $this->user_name = $user['name'];
+            $this->user_cname = $user['cname'];
+        }
     }
 
     /**

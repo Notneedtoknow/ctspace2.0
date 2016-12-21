@@ -154,6 +154,42 @@ class MemberModel extends Model{
         return 10000;
     }
 
+    public function loginSubmit($info){
+        $user = $this->getMember(0,$info['name']);
+        if(empty($user)){
+            return 10018;
+        }
+        $flag = $this->checkPassword($info['pwd'],$info['pwd'],true,$user['encrypt'],$user['password']);
+        if($flag != 10000){
+            return $flag;
+        }
+        $data['last_ip'] = get_client_ip();
+        $data['last_time'] = time();
+        $this->where(array('id'=>$user['id']))->save($data);
+        session('user',$user);
+        return 10000;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /**
      * 生成密码
      * @param $pwd
