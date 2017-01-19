@@ -2,11 +2,27 @@
 return array(
 	//'配置项'=>'配置值'
 
+    //微信基础配置
     'WE_CHAT_CONFIG'            =>  array(
         'AppID'                 =>  'wx173392d089114867',
         'AppSecret'             =>  'ed0bbb18088a38e6133588a3a1018578',
-        'TokenUrl'              =>  'https://api.weixin.qq.com/cgi-bin/token',
+        'Token'                 =>  '',
     ),
+
+    //微信接口url
+    'WE_CHAT_URL'               =>  array(
+        'AccessTokenUrl'        =>  'https://api.weixin.qq.com/cgi-bin/token',
+        'GetIpListUrl'          =>  'https://api.weixin.qq.com/cgi-bin/getcallbackip',
+    ),
+
+
+
+
+
+
+
+
+
 
     'ERROR'                     =>  array(
         //微信公众平台错误码
@@ -91,7 +107,7 @@ return array(
         '46004'                 =>  '不存在的用户',
         '47001'                 =>  '解析JSON/XML内容错误',
         '48001'                 =>  'api功能未授权',
-        '50001'                 =>  '用户未授权该api'
+        '50001'                 =>  '用户未授权该api',
     ),
 
 

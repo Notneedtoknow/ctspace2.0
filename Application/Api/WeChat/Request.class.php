@@ -5,27 +5,22 @@
  * Date: 2017-01-09
  * Time: 14:39
  */
-namespace Api\Logic;
-use Think\Model;
-/**
- * 微信服务
- * Class WeChatLogic
- * @package Api\Service
- */
-class WeChatLogic {
+namespace Api\WeChat;
+class Request extends WeChat
+{
 
     /**
      * @var \Api\Model\WeChatConfigModel
      */
     public $we_chat_config_model;
 
-    public $access_token;
 
     public function __construct()
     {
+        parent::__construct();
         $this->we_chat_config_model = D('WeChatConfig');
         //构建类时检测access_token是否存在
-        if(empty($this->access_token)){
+        if (empty(self::$AccessToken)) {
             $this->getAccessToken();
         }
     }
@@ -33,23 +28,40 @@ class WeChatLogic {
     /**
      * 获得微信公众平台access_token
      * @return mixed
+     * @throws \Exception
      */
-    public function getAccessToken(){
+    private function getAccessToken()
+    {
         $data = $this->we_chat_config_model->order('id desc')->find();
-        if(empty($data) || !isset($data['expires_in']) || $data['expires_in'] < time()){
+        if (empty($data) || !isset($data['expires_in']) || $data['expires_in'] < time()) {
             //若未找到有效的access_token 则重新请求
-            $config = C('WE_CHAT_CONFIG');
-            $url = $config['TokenUrl'].'?grant_type=client_credential&appid='.$config['AppID'].'&secret='.$config['AppSecret'];
+            $url = self::$AccessTokenUrl . '?grant_type=client_credential&appid=' . self::$AppID . '&secret=' . self::$AppSecret;
             $result = json_decode($this->curl($url));
-            if(!isset($result->access_token) || !isset($result->expires_in)){
+            if (!isset($result->access_token) || !isset($result->expires_in)) {
                 \Api\Error\Error::throwException($result->errcode);
             }
-            $this->we_chat_config_model->insert($access_token = $result->access_token,$result->expires_in);
-        }else{
+            $this->we_chat_config_model->insert($access_token = $result->access_token, $result->expires_in);
+        } else {
             $access_token = $data['access_token'];
         }
-        return $this->access_token = $access_token;
+        return self::$AccessToken = $access_token;
     }
+
+    /**
+     * 获得微信服务器ip地址列表
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getWeChatIp()
+    {
+        $url = self::$GetIpListUrl . '?access_token='.self::$AccessToken;
+        $result = json_decode($this->curl($url));
+        if(!isset($result->ip_list)){
+            \Api\Error\Error::throwException($result->errcode);
+        }
+        return $result->ip_list;
+    }
+
 
     /**
      * @param $url

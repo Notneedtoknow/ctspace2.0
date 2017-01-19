@@ -1,13 +1,12 @@
 <?php
 namespace Api\Controller;
 use Common\Controller;
-use Api\Logic\WeChatLogic;
 /**
  * 接口控制器
  * Class ApiController
  * @package Api\Controller
  */
-class ApiController extends Controller\AbstractController {
+class WeChatController extends Controller\AbstractController {
 
     public function __construct()
     {
@@ -15,8 +14,8 @@ class ApiController extends Controller\AbstractController {
     }
 
     public function test(){
-        $we_chat = new WeChatLogic();
-        $result = $we_chat->getAccessToken();
+        $we_chat = new \Api\WeChat\Response();
+        $result = $we_chat->getMessage();
         $this->formatPrint($result);
     }
 
