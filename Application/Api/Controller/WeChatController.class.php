@@ -14,9 +14,9 @@ class WeChatController extends Controller\AbstractController {
     }
 
     public function test(){
-        $we_chat = new \Api\WeChat\Response();
-        $result = $we_chat->getMessage();
-        $this->formatPrint($result);
+        $we_chat_response = new \Api\WeChat\Response();
+        $result = $we_chat_response->getMessage();
+//        $this->formatPrint($result);
     }
 
 }

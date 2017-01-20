@@ -9,8 +9,6 @@ namespace Api\WeChat;
 class Response extends WeChat
 {
 
-    private $postStr;
-
     public function __construct()
     {
         parent::__construct();
@@ -44,13 +42,25 @@ class Response extends WeChat
             return false;
     }
 
+    /**
+     * 获取用户发送信息
+     */
     public function getMessage()
     {
         $echo_str = I('get.echostr');
         if(!empty($echo_str)){
             \Log\File\SaveLogFile::write($echo_str,'','','',true);
         }
-        $this->postStr = $GLOBALS["HTTP_RAW_POST_DATA"];
+        parent::$postStr = $GLOBALS["HTTP_RAW_POST_DATA"];
+        if(empty($this->postStr)){
+            \Log\File\SaveLogFile::write(var_export(parent::$postStr,true),'','','',true);
+        }
+        $result = parent::saveUserMessage();
+        if(!empty($result)){
+            parent::responseTextMessage();
+        }else{
+            echo 'success';
+        }
     }
 
 }
