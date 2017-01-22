@@ -6,7 +6,7 @@ return array(
     'WE_CHAT_CONFIG'            =>  array(
         'AppID'                 =>  'wx173392d089114867',
         'AppSecret'             =>  'ed0bbb18088a38e6133588a3a1018578',
-        'Token'                 =>  '',
+        'Token'                 =>  'togatherandforever',
     ),
 
     //微信接口url
