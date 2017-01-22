@@ -12,11 +12,11 @@ class Response extends WeChat
     public function __construct()
     {
         parent::__construct();
-//        if(!$this->checkSignature()){
-//            //验证签名失败 记录日志
-//            \Log\File\SaveLogFile::write('微信验证签名失败!'.json_encode(I('get.')),'','','',true);
-//            exit ;
-//        }
+        if(!$this->checkSignature()){
+            //验证签名失败 记录日志
+            \Log\File\SaveLogFile::write('微信验证签名失败!'.json_encode(I('get.')),'','','',true);
+            exit ;
+        }
     }
 
     /**
@@ -52,7 +52,7 @@ class Response extends WeChat
             \Log\File\SaveLogFile::write($echo_str,'','','',true);
         }
         parent::$postStr = $GLOBALS["HTTP_RAW_POST_DATA"];
-        if(empty($this->postStr)){
+        if(empty(parent::$postStr)){
             \Log\File\SaveLogFile::write(var_export(parent::$postStr,true),'','','',true);
         }
         $result = parent::saveUserMessage();

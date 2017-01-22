@@ -155,7 +155,7 @@ abstract class WeChat
                     <MsgType><![CDATA[%s]]></MsgType>
                     <Content><![CDATA[%s]]></Content>
                     </xml>";
-        $resultStr = sprintf($textTpl, parent::$ToUserName, parent::$FromUserName, time(), 'text', parent::$respondStr);
+        $resultStr = sprintf($textTpl, self::$ToUserName, self::$FromUserName, time(), 'text', self::$respondStr);
         if (!headers_sent())
             header('Content-Type: application/xml; charset=utf-8');
         self::response($resultStr);
