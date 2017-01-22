@@ -20,7 +20,7 @@ abstract class WeChat
 
     protected static $MsgTypeEnum = array('text','image','voice','video','location','link','event');
 
-    protected static $postStr,$ToUserName,$FromUserName,$CreateTime,$MsgType,$Content,$MsgId;
+    protected static $postStr,$postObj,$ToUserName,$FromUserName,$CreateTime,$MsgType,$Content,$MsgId;
 
     protected static $respondStr;
 
@@ -38,7 +38,7 @@ abstract class WeChat
         $basic_config = C('WE_CHAT_CONFIG');
         self::$AppID = isset($basic_config['AppID']) ? $basic_config['AppID'] : '';
         self::$AppSecret = isset($basic_config['AppSecret']) ? $basic_config['AppSecret'] : '';
-        self::$Token = isset($basic_config['Token']) ? $basic_config['Token'] : '';
+        self::$Token = isset($basic_config['Token']) ? $basic_config['Token'] : 'togatherandforever';
     }
 
     /**
@@ -59,12 +59,12 @@ abstract class WeChat
     {
         $we_chat_text_record = M('WeChatTextRecord');
         $info = array(
-            'msg_id'            =>  self::getMsgId(),
-            'to_user_name'      =>  self::getToUserName(),
-            'open_id'           =>  self::getFromUserName(),
-            'content'           =>  self::getContent(),
+            'msg_id'            =>  trim(self::getMsgId()),
+            'to_user_name'      =>  trim(self::getToUserName()),
+            'open_id'           =>  trim(self::getFromUserName()),
+            'content'           =>  trim(self::getContent()),
             'respond'           =>  self::getRespondStr(),
-            'create_time'       =>  self::getCreateTime(),
+            'create_time'       =>  trim(self::getCreateTime()),
         );
         $result = $we_chat_text_record->add($info);
         return $result;
@@ -91,7 +91,7 @@ abstract class WeChat
      */
     protected static function getToUserName()
     {
-        return self::$postStr->ToUserName;
+        return self::$ToUserName = self::$postObj->ToUserName;
     }
     /**
      * 获得发送方帐号（一个OpenID）
@@ -99,7 +99,7 @@ abstract class WeChat
      */
     protected static function getFromUserName()
     {
-        return self::$postStr->FromUserName;
+        return self::$FromUserName = self::$postObj->FromUserName;
     }
     /**
      * 获得消息创建时间 （整型）
@@ -107,7 +107,7 @@ abstract class WeChat
      */
     protected static function getCreateTime()
     {
-        return self::$postStr->CreateTime;
+        return self::$CreateTime = self::$postObj->CreateTime;
     }
     /**
      * 获得消息类型
@@ -115,7 +115,7 @@ abstract class WeChat
      */
     protected static function getMsgType()
     {
-        return self::$postStr->MsgType;
+        return self::$MsgType = self::$postObj->MsgType;
     }
     /**
      * 获得文本消息内容
@@ -123,7 +123,7 @@ abstract class WeChat
      */
     protected static function getContent()
     {
-        return self::$postStr->Content;
+        return self::$Content = self::$postObj->Content;
     }
     /**
      * 获得消息id，64位整型
@@ -131,7 +131,7 @@ abstract class WeChat
      */
     protected static function getMsgId()
     {
-        return self::$postStr->MsgId;
+        return self::$MsgId = self::$postObj->MsgId;
     }
 
     /**
@@ -140,7 +140,25 @@ abstract class WeChat
      */
     private static function response($content)
     {
+//        \Log\File\SaveLogFile::write("回复消息：".var_export($content,true),'','','',true);
         echo $content;
+    }
+
+    /**
+     * 回复默认文本消息
+     */
+    public function responseDefaultMessage()
+    {
+        $textTpl = "<xml>
+                    <ToUserName><![CDATA[%s]]></ToUserName>
+                    <FromUserName><![CDATA[%s]]></FromUserName>
+                    <CreateTime>%s</CreateTime>
+                    <MsgType><![CDATA[%s]]></MsgType>
+                    <Content><![CDATA[%s]]></Content>
+                    <FuncFlag>0</FuncFlag>
+                    </xml>";
+        $resultStr = sprintf($textTpl, self::$FromUserName, self::$ToUserName, time(), 'text', "对不起，我不知道你在说什么。");
+        self::response($resultStr);
     }
 
     /**
@@ -154,10 +172,9 @@ abstract class WeChat
                     <CreateTime>%s</CreateTime>
                     <MsgType><![CDATA[%s]]></MsgType>
                     <Content><![CDATA[%s]]></Content>
+                    <FuncFlag>0</FuncFlag>
                     </xml>";
-        $resultStr = sprintf($textTpl, self::$ToUserName, self::$FromUserName, time(), 'text', self::$respondStr);
-        if (!headers_sent())
-            header('Content-Type: application/xml; charset=utf-8');
+        $resultStr = sprintf($textTpl, self::$FromUserName, self::$ToUserName, time(), 'text', self::$respondStr);
         self::response($resultStr);
     }
 }

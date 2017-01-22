@@ -10,12 +10,13 @@ class WeChatController extends Controller\AbstractController {
 
     public function __construct()
     {
+        $this->need_login = array('index');
         parent::__construct();
     }
 
     public function test(){
         $we_chat_response = new \Api\WeChat\Response();
-        $result = $we_chat_response->getMessage();
+        $we_chat_response->getMessage();
 //        $this->formatPrint($result);
     }
 

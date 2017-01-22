@@ -12,10 +12,18 @@ class Response extends WeChat
     public function __construct()
     {
         parent::__construct();
-        if(!$this->checkSignature()){
-            //验证签名失败 记录日志
-            \Log\File\SaveLogFile::write('微信验证签名失败!'.json_encode(I('get.')),'','','',true);
-            exit ;
+        $this->valid();
+    }
+
+    public function valid()
+    {
+        $echo_str = I('get.echostr');
+        if($this->checkSignature()){
+            \Log\File\SaveLogFile::write(var_export($echo_str,true)."验证签名成功！",'','','',true);
+            echo $echo_str;
+//            exit ;
+        }else{
+            \Log\File\SaveLogFile::write(var_export(parent::$Token,true)."验证签名失败！",'','','',true);
         }
     }
 
@@ -23,7 +31,7 @@ class Response extends WeChat
      * 验证签名
      * @return bool
      */
-    public function checkSignature()
+    private function checkSignature()
     {
         $signature = I('get.signature');
         $timestamp = I('get.timestamp');
@@ -31,8 +39,8 @@ class Response extends WeChat
         if (empty($signature) || empty($timestamp) || empty($nonce))
             return false;
 
-        $tmpArr = array(self::$Token, $timestamp, $nonce);
-        sort($tmpArr);
+        $tmpArr = array(parent::$Token, $timestamp, $nonce);
+        sort($tmpArr , SORT_STRING);
         $tmpStr = implode($tmpArr);
         $tmpStr = sha1($tmpStr);
 
@@ -47,20 +55,23 @@ class Response extends WeChat
      */
     public function getMessage()
     {
-        $echo_str = I('get.echostr');
-        if(!empty($echo_str)){
-            \Log\File\SaveLogFile::write($echo_str,'','','',true);
-        }
         parent::$postStr = $GLOBALS["HTTP_RAW_POST_DATA"];
         if(empty(parent::$postStr)){
-            \Log\File\SaveLogFile::write(var_export(parent::$postStr,true),'','','',true);
+            echo "";
+            \Log\File\SaveLogFile::write("输出到微信终端数据！(无post)！",'','','',true);
+            exit ;
         }
-        $result = parent::saveUserMessage();
+        libxml_disable_entity_loader(true);
+        parent::$postObj = simplexml_load_string(parent::$postStr, 'SimpleXMLElement', LIBXML_NOCDATA);
+        parent::saveUserMessage();
         if(!empty($result)){
             parent::responseTextMessage();
         }else{
-            echo 'success';
+            parent::responseDefaultMessage();
+            \Log\File\SaveLogFile::write("保存用户发送信息失败！".var_export(parent::$postStr,true),'','','',true);
         }
+
     }
+
 
 }
